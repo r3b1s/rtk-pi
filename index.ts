@@ -1,16 +1,14 @@
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { rewrite, initSupportedCommands } from "./rewrite";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { initSupportedCommands, rewrite } from "./rewrite.ts";
 import { readFileSync } from "fs";
-import { join } from "path";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const RTK_PROMPT = readFileSync(join(__dirname, "rtk.md"), "utf-8");
 
 export default async function (pi: ExtensionAPI) {
-  const available = await initSupportedCommands();
-  if (!available) {
-    console.warn("[pi-rtk-hook] rtk binary not found in PATH — extension disabled");
-    return;
-  }
+  initSupportedCommands();
 
   // Inject RTK meta-command docs into system prompt
   pi.on("before_agent_start", async (event) => ({

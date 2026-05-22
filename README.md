@@ -1,31 +1,38 @@
 # rtk-pi
 
-[RTK (Rust Token Killer)](https://github.com/nichochar/rtk) extension for [pi-coding-agent](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent). Transparently rewrites bash commands through `rtk` to reduce LLM token consumption by 60-90%.
+[RTK (Rust Token Killer)](https://github.com/rtk-ai/rtk) extension for [pi-coding-agent](https://github.com/earendil-works/pi/tree/main/packages/coding-agent). It transparently routes eligible bash commands through `rtk` to reduce LLM token consumption by 60-90%.
 
-This requires `rtk` -> https://github.com/rtk-ai
+This extension requires `rtk`: https://github.com/rtk-ai/rtk
 
-The main goal here is minimalism. It's just hooks rtk into pi. Other rtk implementations I've found on npm are not trustworthy and seem to reimplement the original rtk logic or add their own blend of secret spices.
+The goal is minimalism. This package simply hooks an existing RTK installation into pi. Other RTK-related npm packages I found appear to reimplement RTK output filtering or add extra behavior.
 
-This extension is designed to work WITH an existing rtk installation.
-It does NOT add any additional logic or rewrite the functionality of the original `rtk` tool.
-It just utilizes interfaces/hooks exposed by `pi` to automatically rewrite bash commands.
+This extension does not replace the functionality of the original `rtk` tool. It only uses pi hooks to route eligible shell commands through RTK, while keeping RTK responsible for command execution and output optimization.
 
 ## Install
 
-Add to your pi agent extensions config (e.g. `.pi/extensions/` or `settings.json`):
+Install via git:
+
+```bash
+pi install git:https://github.com/r3b1s/rtk-pi
+```
+
+Or add it to your pi agent extensions config (for example, `.pi/extensions/` or `settings.json`) if you are using a local checkout:
 
 ```
 /path/to/rtk-pi
 ```
 
-Requires `rtk` to be installed and on your `PATH`.
+`rtk` must be installed and available on your `PATH`.
 
 ## How it works
 
-1. On startup, parses `rtk help` to discover supported commands
-2. Intercepts `bash` tool calls and rewrites commands (e.g. `git status` → `rtk git status`)
-3. Skips interactive commands (`-i` flags), heredocs, and commands already using `rtk`
-4. Injects RTK meta-command documentation into the system prompt
+1. On startup, it parses `rtk help` and stores the available RTK subcommands.
+2. It removes systemic/meta RTK commands from that set, keeping only optimizer commands.
+3. It intercepts `bash` tool calls and prefixes matching optimizer commands with `rtk`.
+4. It maps common aliases where RTK uses a different subcommand, such as `cat` → `rtk read` and `rg` → `rtk grep`.
+5. It skips commands that are already prefixed with `rtk`, interactive commands, heredocs, and commands RTK does not expose as optimizers.
+6. It fails open: if `rtk` is missing or parsing fails, the original command runs unchanged. If RTK appears later, the extension retries parsing on the next rewrite attempt.
+7. It injects RTK meta-command documentation into the system prompt.
 
 ## Meta commands
 
@@ -33,5 +40,7 @@ Requires `rtk` to be installed and on your `PATH`.
 rtk gain              # Show token savings analytics
 rtk gain --history    # Show command usage history
 rtk discover          # Find missed optimization opportunities
+rtk session           # Show RTK adoption across recent sessions
 rtk proxy <cmd>       # Run command without rtk filtering
+rtk rewrite <cmd>     # Show how RTK would rewrite a raw command
 ```

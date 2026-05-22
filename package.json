@@ -1,10 +1,15 @@
 {
   "name": "rtk-pi",
-  "version": "0.1.0",
-  "description": "RTK (Rust Token Killer) extension for pi-coding-agent — transparently rewrites bash commands through rtk",
-  "main": "index.ts",
+  "version": "0.2.0",
+  "description": "RTK (Rust Token Killer) extension for pi-coding-agent — routes eligible bash commands through rtk",
+  "type": "module",
   "license": "MIT",
-  "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "*"
+  "keywords": [
+    "pi-package"
+  ],
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
   }
 }

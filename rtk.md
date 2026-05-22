@@ -8,12 +8,16 @@
 rtk gain              # Show token savings analytics
 rtk gain --history    # Show command usage history with savings
 rtk discover          # Analyze history for missed optimization opportunities
+rtk session           # Show RTK adoption across recent sessions
 rtk proxy <cmd>       # Execute raw command without filtering (for debugging)
+rtk rewrite <cmd>     # Show how RTK would rewrite a raw command
 ```
 
 ## How It Works
 
-All shell commands are automatically rewritten through RTK by the rtk-pi extension.
+Eligible shell commands are automatically rewritten through RTK by the rtk-pi extension.
+The extension parses available RTK optimizer subcommands from `rtk help` and prefixes matching shell commands.
 Example: `git status` becomes `rtk git status` transparently, producing compressed output.
 
-No manual prefixing is needed. Just run commands normally.
+Commands already prefixed with `rtk`, RTK meta commands, interactive commands, heredocs, and unsupported commands are left unchanged.
+No manual prefixing is needed for supported optimizer commands. Just run commands normally.
